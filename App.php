@@ -7,19 +7,26 @@ require_once('./HttpResponse.php');
 require_once('./LightWeightHttpClient.php');
 
 (function($client) {
-    $client->setHeaders([
-        'Accept: application/json',
-        'Authorization: Bearer '.BEARER_TOKEN
-    ]);
+    try {
+        $response = $client->options('assessment-endpoint.php');
+        $token = $response['body'];
 
-    print_r($client->get('posts'));
+        $client->setHeaders([
+            'Accept: application/json',
+            'Authorization: Bearer '.$token
+        ]);
+    
+        $response = $client->post('posts', [
+            'json' => [
+                'name' => 'Serhii Holovanenko',
+                'email' => 'serhii.holovanenko@gmail.com',
+                'url' => 'https://github.com/SHolovanenko/test-light-weight-http-client'
+            ]
+        ]);
 
-    print_r($client->post('posts', [
-        'json' => [
-            'user_id' => 1,
-            'title' => 'my title',
-            'body' => 'my text'
-        ]
-    ]));
+        print_r($response);
 
-}) (new LightWeightHttpClient('https://gorest.co.in/public-api'));
+    } catch (Exception $e) {
+        print_r($e->message);
+    }
+}) (new LightWeightHttpClient('https://www.coredna.com'));
